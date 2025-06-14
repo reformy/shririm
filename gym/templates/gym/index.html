@@ -1,0 +1,91 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Shririm - Home{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <h1 class="h3">Welcome to Shririm</h1>
+        <p class="text-muted">Track your gym sessions and progress</p>
+    </div>
+
+    {% if active_session %}
+        <div class="col-md-12 mb-4">
+            <div class="alert alert-info">
+                <h5><i class="fas fa-running me-2"></i>Active Session</h5>
+                <p>You have an active session for plan: <strong>{{ active_session.plan.name }}</strong></p>
+                <p>Started: {{ active_session.start_time|date:"F j, Y, g:i a" }}</p>
+                <a href="{% url 'gym:session_detail' active_session.id %}" class="btn btn-primary">Continue Session</a>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Your Plans</h5>
+            </div>
+            <div class="card-body">
+                {% if plans %}
+                    <div class="list-group">
+                        {% for plan in plans %}
+                            <a href="{% url 'gym:plan_detail' plan.id %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{{ plan.name }}</h5>
+                                    <small>{{ plan.plan_devices.count }} devices</small>
+                                </div>
+                                <small class="text-muted">Created: {{ plan.created_at|date:"F j, Y" }}</small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-3">
+                        <a href="{% url 'gym:plan_list' %}" class="btn btn-outline-primary">View All Plans</a>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-3">You haven't created any plans yet.</p>
+                    <a href="{% url 'gym:plan_create' %}" class="btn btn-primary">Create Your First Plan</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Sessions</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_sessions %}
+                    <div class="list-group">
+                        {% for session in recent_sessions %}
+                            <a href="{% url 'gym:session_detail' session.id %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{{ session.plan.name }}</h5>
+                                    <small class="badge bg-{{ session.status|yesno:'success,warning,secondary' }}">
+                                        {{ session.get_status_display }}
+                                    </small>
+                                </div>
+                                <small class="text-muted">{{ session.start_time|date:"F j, Y, g:i a" }}</small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-3">
+                        <a href="{% url 'gym:session_list' %}" class="btn btn-outline-primary">View All Sessions</a>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-3">You haven't started any sessions yet.</p>
+                    <a href="{% url 'gym:session_start' %}" class="btn btn-primary">Start Your First Session</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12 mb-4">
+        <div class="d-grid gap-2 col-md-6 mx-auto">
+            <a href="{% url 'gym:session_start' %}" class="btn btn-lg btn-success">
+                <i class="fas fa-play me-2"></i>Start New Session
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

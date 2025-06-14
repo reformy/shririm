@@ -1,0 +1,87 @@
+{% extends 'gym/base.html' %}
+{% load timezone_filters %}
+
+{% block title %}Shririm - Start Session{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <h1 class="h3">Start New Workout Session</h1>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Choose a Plan</h5>
+            </div>
+            <div class="card-body">
+                {% if form.fields.plan.queryset %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_plan" class="form-label">Select Workout Plan</label>
+                            <select name="plan" id="id_plan" class="form-control" required>
+                                <option value="">---------</option>
+                                {% for plan in form.fields.plan.queryset %}
+                                    <option value="{{ plan.id }}">{{ plan.name }} ({{ plan.plan_devices.count }} devices)</option>
+                                {% endfor %}
+                            </select>
+                            {% if form.plan.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.plan.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Selecting a plan will start a new workout session with all devices from that plan.
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-play me-1"></i> Start Session
+                            </button>
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="alert alert-warning">
+                        <h5>No Plans Available</h5>
+                        <p>You need to create a workout plan before starting a session.</p>
+                        <a href="{% url 'gym:plan_create' %}" class="btn btn-primary mt-2">
+                            <i class="fas fa-plus me-1"></i> Create Your First Plan
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Recent Sessions</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_sessions %}
+                    <div class="list-group">
+                        {% for session in recent_sessions %}
+                            <a href="{% url 'gym:session_detail' session.id %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ session.plan.name }}</h6>
+                                    <small>{% format_date_in_timezone session.start_time user_timezone %}</small>
+                                </div>
+                                <small class="text-muted">
+                                    Completed: {{ session.completed_count }} / {{ session.total_count }}
+                                </small>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No recent sessions.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

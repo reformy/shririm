@@ -1,0 +1,106 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Shririm - Update Exercise{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Update: {{ device_session.device.name }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_chair_position" class="form-label">Chair Position</label>
+                        <input type="text" name="chair_position" id="id_chair_position" class="form-control" 
+                               value="{{ form.chair_position.value|default:'' }}">
+                        {% if form.chair_position.errors %}
+                            <div class="text-danger">
+                                {% for error in form.chair_position.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_weight" class="form-label">Weight (kg)</label>
+                        <input type="number" name="weight" id="id_weight" class="form-control" step="0.5"
+                               value="{{ form.weight.value|default:'' }}">
+                        {% if form.weight.errors %}
+                            <div class="text-danger">
+                                {% for error in form.weight.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="id_sets" class="form-label">Sets</label>
+                            <input type="number" name="sets" id="id_sets" class="form-control" min="1" 
+                                   value="{{ form.sets.value }}">
+                            {% if form.sets.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.sets.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_moves_per_set" class="form-label">Moves Per Set</label>
+                            <input type="number" name="moves_per_set" id="id_moves_per_set" class="form-control" min="1"
+                                   value="{{ form.moves_per_set.value }}">
+                            {% if form.moves_per_set.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.moves_per_set.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_notes" class="form-label">Notes (Optional)</label>
+                        <textarea name="notes" id="id_notes" class="form-control" rows="3">{{ form.notes.value|default:'' }}</textarea>
+                        {% if form.notes.errors %}
+                            <div class="text-danger">
+                                {% for error in form.notes.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" name="performed" id="id_performed" class="form-check-input" 
+                               {% if form.performed.value %}checked{% endif %}>
+                        <label for="id_performed" class="form-check-label">Mark as Completed</label>
+                        {% if form.performed.errors %}
+                            <div class="text-danger">
+                                {% for error in form.performed.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'gym:session_detail' session.id %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Session
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

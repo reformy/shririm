@@ -1,0 +1,160 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Shririm - {{ plan.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css">
+<style>
+    .device-item {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        padding: 15px;
+        border: 1px solid #dee2e6;
+    }
+    .device-item:hover {
+        border-color: #adb5bd;
+    }
+    .sortable-placeholder {
+        border: 1px dashed #ced4da;
+        background-color: #f8f9fa;
+        height: 80px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+    }
+    .sortable-handle {
+        cursor: move;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h3">{{ plan.name }}</h1>
+            <div>
+                <a href="{% url 'gym:session_start' %}" class="btn btn-success me-2">
+                    <i class="fas fa-play me-1"></i> Start Session
+                </a>
+                <div class="btn-group">
+                    <a href="{% url 'gym:plan_edit' plan.id %}" class="btn btn-outline-primary">
+                        <i class="fas fa-edit me-1"></i> Edit Plan
+                    </a>
+                    <a href="{% url 'gym:plan_delete' plan.id %}" class="btn btn-outline-danger">
+                        <i class="fas fa-trash me-1"></i> Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+        <p class="text-muted">Created: {{ plan.created_at|date:"F j, Y" }}</p>
+    </div>
+
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Devices in This Plan</h5>
+                <a href="{% url 'gym:plan_add_device' plan.id %}" class="btn btn-light btn-sm">
+                    <i class="fas fa-plus me-1"></i> Add Device
+                </a>
+            </div>
+            <div class="card-body">
+                {% if plan_devices %}
+                    <p class="mb-3">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Drag items to reorder your workout sequence.
+                        </small>
+                    </p>
+                    <ul id="device-list" class="list-unstyled">
+                        {% for plan_device in plan_devices %}
+                            <li class="device-item" data-id="{{ plan_device.id }}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">
+                                            <span class="sortable-handle me-2">
+                                                <i class="fas fa-grip-vertical"></i>
+                                            </span>
+                                            {{ plan_device.name|default:plan_device.device.name }}
+                                        </h5>
+                                        <div class="small text-muted mb-2">
+                                            Device: {{ plan_device.device.name }} • Order: {{ plan_device.order }}
+                                        </div>
+                                    </div>
+                                    <a href="{% url 'gym:plan_remove_device' plan.id plan_device.id %}" 
+                                       class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 col-6 mb-2">
+                                        <div class="small text-muted">Chair Position</div>
+                                        <div>{{ plan_device.chair_position|default:"--" }}</div>
+                                    </div>
+                                    <div class="col-md-3 col-6 mb-2">
+                                        <div class="small text-muted">Weight</div>
+                                        <div>{{ plan_device.weight|default:"--" }} kg</div>
+                                    </div>
+                                    <div class="col-md-3 col-6 mb-2">
+                                        <div class="small text-muted">Sets</div>
+                                        <div>{{ plan_device.sets }}</div>
+                                    </div>
+                                    <div class="col-md-3 col-6 mb-2">
+                                        <div class="small text-muted">Moves per Set</div>
+                                        <div>{{ plan_device.moves_per_set }}</div>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="alert alert-info">
+                        <p>This plan doesn't have any devices yet. Add your first device to get started!</p>
+                        <a href="{% url 'gym:plan_add_device' plan.id %}" class="btn btn-primary mt-2">
+                            <i class="fas fa-plus me-1"></i> Add First Device
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(function() {
+        $("#device-list").sortable({
+            handle: ".sortable-handle",
+            placeholder: "sortable-placeholder",
+            update: function(event, ui) {
+                // Get the new order
+                var deviceOrder = [];
+                $("#device-list li").each(function() {
+                    deviceOrder.push($(this).data("id"));
+                });
+                
+                // Send the new order to the server
+                $.ajax({
+                    url: "{% url 'gym:plan_reorder_devices' plan.id %}",
+                    type: "POST",
+                    data: {
+                        'device_order[]': deviceOrder,
+                        'csrfmiddlewaretoken': "{{ csrf_token }}"
+                    },
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            // Reload the page to reflect changes
+                            location.reload();
+                        }
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

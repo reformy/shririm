@@ -1,0 +1,78 @@
+{% extends 'gym/base.html' %}
+{% load static %}
+
+{% block title %}Shririm - Edit Profile{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Edit Profile</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <h5 class="mb-3">Personal Information</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="id_first_name" class="form-label">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_last_name" class="form-label">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label">Email</label>
+                        {{ form.email }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_bio" class="form-label">Bio</label>
+                        {{ form.bio }}
+                        <div class="form-text">Tell us a bit about yourself</div>
+                    </div>
+                    
+                    <h5 class="mb-3 mt-4">Physical Information</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="id_date_of_birth" class="form-label">Date of Birth</label>
+                            {{ form.date_of_birth }}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="id_height" class="form-label">Height (cm)</label>
+                            {{ form.height }}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="id_weight" class="form-label">Weight (kg)</label>
+                            {{ form.weight }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_goal" class="form-label">Fitness Goal</label>
+                        {{ form.goal }}
+                        <div class="form-text">What are you aiming to achieve with your workouts?</div>
+                    </div>
+                    
+                    <h5 class="mb-3 mt-4">Preferences</h5>
+                    <div class="mb-3">
+                        <label for="id_timezone" class="form-label">Your Timezone</label>
+                        {{ form.timezone }}
+                        <div class="form-text">Your local timezone for accurate workout time display</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'gym:profile' %}" class="btn btn-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

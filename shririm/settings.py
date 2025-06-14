@@ -10,22 +10,34 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Environment settings
+# Check if running in development or production
+# Set DJANGO_ENV=production on your production server
+ENVIRONMENT = os.environ.get('DJANGO_ENV', 'development')
+IS_DEVELOPMENT = ENVIRONMENT == 'development'
+IS_PRODUCTION = ENVIRONMENT == 'production'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)ml6vssv%&^kcc-eehl6e)js0dx00s0vq@6%@vx-=e)2uceqph'
+# In production, use an environment variable for the secret key
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-)ml6vssv%&^kcc-eehl6e)js0dx00s0vq@6%@vx-=e)2uceqph')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = IS_DEVELOPMENT
 
-ALLOWED_HOSTS = []
+# Allow all hosts in development, specific hosts in production
+if IS_DEVELOPMENT:
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = ['shririm.yair.app', 'shririm.yair.app']
 
 
 # Application definition
@@ -37,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'gym',
 ]
 
 MIDDLEWARE = [
@@ -62,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'gym.context_processors.user_timezone',
             ],
         },
     },
@@ -73,6 +87,8 @@ WSGI_APPLICATION = 'shririm.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# Use SQLite for both development and production for now
+# For larger scale, consider migrating to PostgreSQL in production later
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -116,8 +132,31 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+if IS_DEVELOPMENT:
+    STATIC_ROOT = BASE_DIR / 'staticfiles'
+else:
+    # In production, you might want to use a different location
+    STATIC_ROOT = os.environ.get('STATIC_ROOT', BASE_DIR / 'staticfiles')
+    
+    # Configure additional security settings for production
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Login URL settings
+LOGIN_URL = 'gym:login'
+LOGIN_REDIRECT_URL = 'gym:index'
+LOGOUT_REDIRECT_URL = 'gym:login'
