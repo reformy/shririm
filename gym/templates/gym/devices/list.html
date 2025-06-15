@@ -17,6 +17,15 @@
         {% for device in devices %}
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card device-card h-100">
+                    <div class="text-center pt-3">
+                        {% if device.image %}
+                            <img src="{{ device.image.url }}" alt="{{ device.name }}" class="card-img-top img-fluid" style="max-height: 150px; object-fit: contain;">
+                        {% else %}
+                            <div class="d-flex justify-content-center align-items-center" style="height: 150px;">
+                                <i class="fas fa-dumbbell text-secondary" style="font-size: 60px;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
                     <div class="card-body">
                         <h5 class="card-title">{{ device.name }}</h5>
                         <p class="card-text text-muted small">

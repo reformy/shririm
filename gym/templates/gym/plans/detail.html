@@ -88,11 +88,21 @@
                                     </a>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-3 col-6 mb-2">
+                                    <div class="col-md-2 mb-2 text-center">
+                                        {% if plan_device.device.image %}
+                                            <img src="{{ plan_device.device.image.url }}" alt="{{ plan_device.device.name }}" 
+                                                 class="img-fluid rounded" style="max-height: 60px; object-fit: contain;">
+                                        {% else %}
+                                            <div class="d-flex justify-content-center align-items-center h-100" style="min-height: 60px;">
+                                                <i class="fas fa-dumbbell text-secondary" style="font-size: 30px;"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-2 col-6 mb-2">
                                         <div class="small text-muted">Chair Position</div>
                                         <div>{{ plan_device.chair_position|default:"--" }}</div>
                                     </div>
-                                    <div class="col-md-3 col-6 mb-2">
+                                    <div class="col-md-2 col-6 mb-2">
                                         <div class="small text-muted">Weight</div>
                                         <div>{{ plan_device.weight|default:"--" }} kg</div>
                                     </div>

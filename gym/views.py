@@ -107,7 +107,7 @@ def device_list(request):
 @login_required
 def device_create(request):
     if request.method == 'POST':
-        form = DeviceForm(request.POST)
+        form = DeviceForm(request.POST, request.FILES)
         if form.is_valid():
             device = form.save(commit=False)
             device.created_by = request.user
@@ -127,7 +127,7 @@ def device_detail(request, device_id):
 def device_edit(request, device_id):
     device = get_object_or_404(Device, id=device_id, created_by=request.user)
     if request.method == 'POST':
-        form = DeviceForm(request.POST, instance=device)
+        form = DeviceForm(request.POST, request.FILES, instance=device)
         if form.is_valid():
             form.save()
             messages.success(request, f"Device '{device.name}' updated successfully.")

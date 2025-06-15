@@ -5,10 +5,11 @@ from .models import Device, Plan, PlanDevice, Session, DeviceSession, UserProfil
 class DeviceForm(forms.ModelForm):
     class Meta:
         model = Device
-        fields = ['name', 'description']
+        fields = ['name', 'description', 'image']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
 class PlanForm(forms.ModelForm):
