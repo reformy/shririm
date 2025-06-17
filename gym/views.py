@@ -352,7 +352,13 @@ def session_start(request):
 @login_required
 def session_detail(request, session_id):
     session = get_object_or_404(Session, id=session_id, user=request.user)
-    device_sessions = session.device_sessions.all().order_by('order')
+    
+    # For sessions in progress, order unperformed devices first, then performed ones
+    # Within each group, still maintain the original 'order'
+    if session.status == 'in_progress':
+        device_sessions = session.device_sessions.all().order_by('performed', 'order')
+    else:
+        device_sessions = session.device_sessions.all().order_by('order')
     
     return render(request, 'gym/sessions/detail.html', {
         'session': session,

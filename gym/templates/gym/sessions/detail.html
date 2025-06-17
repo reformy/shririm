@@ -9,6 +9,10 @@
         background-color: #f8fff8;
         border-left: 4px solid #28a745;
     }
+    
+    .session-in-progress .performed {
+        color: #9ca3af;  /* Light gray text for performed items */
+    }
 </style>
 {% endblock %}
 
@@ -67,7 +71,7 @@
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">Workout Devices</h5>
             </div>
-            <div class="card-body p-0">
+            <div class="card-body p-0 {% if session.status == 'in_progress' %}session-in-progress{% endif %}">
                 {% if device_sessions %}
                     <div class="list-group list-group-flush">
                         {% for device_session in device_sessions %}
