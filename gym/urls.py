@@ -25,6 +25,7 @@ urlpatterns = [
     path('plans/<int:plan_id>/', views.plan_detail, name='plan_detail'),
     path('plans/<int:plan_id>/edit/', views.plan_edit, name='plan_edit'),
     path('plans/<int:plan_id>/delete/', views.plan_delete, name='plan_delete'),
+    path('plans/<int:plan_id>/select_device/', views.plan_select_device, name='plan_select_device'),
     path('plans/<int:plan_id>/add_device/', views.plan_add_device, name='plan_add_device'),
     path('plans/<int:plan_id>/remove_device/<int:plan_device_id>/', views.plan_remove_device, name='plan_remove_device'),
     path('plans/<int:plan_id>/reorder_devices/', views.plan_reorder_devices, name='plan_reorder_devices'),

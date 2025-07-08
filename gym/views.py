@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.db.models import Max
 
 from .models import Device, Plan, PlanDevice, Session, DeviceSession, UserProfile
-from .forms import DeviceForm, PlanForm, PlanDeviceForm, SessionStartForm, DeviceSessionUpdateForm, UserProfileForm
+from .forms import DeviceForm, PlanForm, PlanDeviceForm, PlanDeviceAddForm, SessionStartForm, DeviceSessionUpdateForm, UserProfileForm
 
 # Authentication views
 def login_view(request):
@@ -218,14 +218,43 @@ def plan_delete(request, plan_id):
     return render(request, 'gym/plans/delete.html', {'plan': plan})
 
 @login_required
+def plan_select_device(request, plan_id):
+    plan = get_object_or_404(Plan, id=plan_id, user=request.user)
+    
+    # Get user's own devices first (ordered by id)
+    user_devices = Device.objects.filter(created_by=request.user).order_by('id')
+    
+    # Get other users' devices (ordered by id)
+    other_devices = Device.objects.exclude(created_by=request.user).order_by('id')
+    
+    # Combine the querysets with user's devices first
+    devices = list(user_devices) + list(other_devices)
+    
+    return render(request, 'gym/plans/select_device.html', {
+        'plan': plan,
+        'devices': devices,
+        'current_user': request.user
+    })
+
+@login_required
 def plan_add_device(request, plan_id):
     plan = get_object_or_404(Plan, id=plan_id, user=request.user)
     
+    # Get the device_id from query parameters
+    device_id = request.GET.get('device_id')
+    if not device_id:
+        messages.error(request, "No device selected.")
+        return redirect('gym:plan_select_device', plan_id=plan.id)
+    
+    # Get the selected device (can be from any user)
+    device = get_object_or_404(Device, id=device_id)
+    
     if request.method == 'POST':
-        form = PlanDeviceForm(request.POST)
+        form = PlanDeviceAddForm(request.POST)
         if form.is_valid():
             plan_device = form.save(commit=False)
             plan_device.plan = plan
+            plan_device.device = device
             
             # Determine order (add to end)
             max_order = plan.plan_devices.aggregate(Max('order'))['order__max'] or 0
@@ -235,14 +264,12 @@ def plan_add_device(request, plan_id):
             messages.success(request, "Device added to plan successfully.")
             return redirect('gym:plan_detail', plan_id=plan.id)
     else:
-        form = PlanDeviceForm()
-        
-    # Only show devices created by the user
-    form.fields['device'].queryset = Device.objects.filter(created_by=request.user)
+        form = PlanDeviceAddForm()
     
     return render(request, 'gym/plans/add_device.html', {
         'form': form,
-        'plan': plan
+        'plan': plan,
+        'device': device
     })
 
 @login_required

@@ -1,4 +1,5 @@
 {% extends 'gym/base.html' %}
+{% load timezone_filters %}
 
 {% block title %}Shririm - Home{% endblock %}
 
@@ -14,7 +15,7 @@
             <div class="alert alert-info">
                 <h5><i class="fas fa-running me-2"></i>Active Session</h5>
                 <p>You have an active session for plan: <strong>{{ active_session.plan.name }}</strong></p>
-                <p>Started: {{ active_session.start_time|date:"F j, Y, g:i a" }}</p>
+                <p>Started: {% format_datetime_in_timezone active_session.start_time user_timezone %}</p>
                 <a href="{% url 'gym:session_detail' active_session.id %}" class="btn btn-primary">Continue Session</a>
             </div>
         </div>
@@ -65,7 +66,7 @@
                                         {{ session.get_status_display }}
                                     </small>
                                 </div>
-                                <small class="text-muted">{{ session.start_time|date:"F j, Y, g:i a" }}</small>
+                                <small class="text-muted">{% format_datetime_in_timezone session.start_time user_timezone %}</small>
                             </a>
                         {% endfor %}
                     </div>

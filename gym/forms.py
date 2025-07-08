@@ -42,6 +42,23 @@ class PlanDeviceForm(forms.ModelForm):
         if self.instance and self.instance.pk:
             self.fields['name'].initial = self.instance.name
 
+class PlanDeviceAddForm(forms.ModelForm):
+    class Meta:
+        model = PlanDevice
+        fields = ['name', 'chair_position', 'weight', 'sets', 'moves_per_set']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'chair_position': forms.TextInput(attrs={'class': 'form-control'}),
+            'weight': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.25'}),
+            'sets': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'moves_per_set': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+        }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make name field optional in the form - model will auto-generate if not provided
+        self.fields['name'].required = False
+
 class SessionStartForm(forms.Form):
     plan = forms.ModelChoiceField(
         queryset=Plan.objects.none(),
