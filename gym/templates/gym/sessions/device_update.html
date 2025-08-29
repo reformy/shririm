@@ -27,7 +27,7 @@
                     
                     <div class="mb-3">
                         <label for="id_weight" class="form-label">Weight (kg)</label>
-                        <input type="number" name="weight" id="id_weight" class="form-control" step="0.5"
+                        <input type="number" name="weight" id="id_weight" class="form-control" step="0.25"
                                value="{{ form.weight.value|default:'' }}">
                         {% if form.weight.errors %}
                             <div class="text-danger">
