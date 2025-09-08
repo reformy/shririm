@@ -1,0 +1,43 @@
+<html>
+
+<head>
+    <style>
+        html {
+    user-select: none;
+}
+
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    font-family: Arimo, Arial, sans-serif;
+}
+
+input {
+    width: 200px;
+    height: 50px;
+}
+    </style>
+</head>
+
+
+<body>
+Add word:<br/><h1>{{ word }}</h1>
+<br/>
+<form method="post" action="#">
+    {% csrf_token %}
+    <input type="hidden" name="word" value="{{ word }}"/>
+    <input type="submit" value="Good" name="good"/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <input type="submit" value="Bad" name="bad"/>
+
+    <br/>
+    <br/>
+    <br/>
+    <textarea cols="10" rows="20" name="words" id="words"></textarea>
+</form>
+</body>
+
+</html>
