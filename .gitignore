@@ -200,3 +200,6 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 **/.claude/settings.local.json
+
+/shririm/memaheret/new_words.txt
+/shririm/memaheret/no_words.txt

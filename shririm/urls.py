@@ -20,9 +20,17 @@ from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 
+from .memaheret.view import MemaheretWOTHView, AddWordsView
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('gym/', include('gym.urls', namespace='gym')),
+
+    # For Memaheret.
+    path('woth.js', MemaheretWOTHView.as_view(), name='memaheret'),
+    path('add_word/', AddWordsView.as_view(), name='memaheret_add_word'),
+
     path('', RedirectView.as_view(pattern_name='gym:index', permanent=False)),
 ]
 
