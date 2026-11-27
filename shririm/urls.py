@@ -20,8 +20,11 @@ from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 
+from gym.login_rate_limit import rate_limited_login
 from .memaheret.view import MemaheretWOTHView, AddWordsView
 
+# Before admin.site.urls (below), which picks up admin.site.login when it is read.
+admin.site.login = rate_limited_login(admin.site.login)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

@@ -54,11 +54,13 @@ The application implements:
 - Admin interface is configured
 - Mobile-friendly UI with Bootstrap
 
-## Known Issues to Fix
+## Tests
 
-1. **Login URL Mismatch**: The login URL pattern is causing 404 errors - URLs are configured for `/gym/accounts/login/` but the code is looking for `/accounts/login/`
-2. **Static Files**: Static files (CSS, JS) may need to be properly configured
-3. **Testing**: No tests have been written yet
+```
+DJANGO_ENV=development python manage.py test
+```
+
+GitHub Actions runs them on every push to main and every pull request (`.github/workflows/tests.yml`).
 
 ## Next Steps
 
@@ -67,7 +69,19 @@ The application implements:
 3. Implement user profile page
 4. Add data visualization for tracking progress
 5. Add search and filtering capabilities
-6. Create comprehensive test suite
+6. Extend the test suite
+
+## Configuration
+
+Settings come from environment variables, or from a `.env` file next to `manage.py` (it is in `.gitignore`):
+
+```
+DJANGO_ENV=development      # Your own computer only: DEBUG on. Anything else (or unset) is production.
+DJANGO_SECRET_KEY=...       # Required in production.
+```
+
+Make a secret key with
+`python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"`.
 
 ## Setup for Development
 
@@ -81,7 +95,7 @@ The application implements:
    python manage.py migrate
    ```
 
-3. Create a superuser (already done with username: 'reformy'):
+3. Create a superuser:
    ```
    python manage.py createsuperuser
    ```
@@ -95,9 +109,7 @@ The application implements:
 
 ## Admin Access
 
-- URL: http://localhost:8000/admin/
-- Username: reformy
-- Password: alibaliba
+- URL: http://localhost:8000/admin/, with the superuser you created.
 
 ## Technologies Used
 
