@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
@@ -10,6 +12,8 @@ from django.db.models import Max
 
 from .models import Device, Plan, PlanDevice, Session, DeviceSession, UserProfile
 from .forms import DeviceForm, PlanForm, PlanDeviceForm, PlanDeviceAddForm, SessionStartForm, DeviceSessionUpdateForm, UserProfileForm
+
+logger = logging.getLogger(__name__)
 
 # Authentication views
 def login_view(request):
@@ -44,8 +48,9 @@ def login_view(request):
         else:
             form = AuthenticationForm()
         return render(request, 'gym/auth/login.html', {'form': form})
-    except Exception as e:
-        messages.error(request, f"An error occurred during login: {str(e)}")
+    except Exception:
+        logger.exception("An error occurred during login.")
+        messages.error(request, "An error occurred during login. Please try again.")
         form = AuthenticationForm()
         return render(request, 'gym/auth/login.html', {'form': form})
 
@@ -77,8 +82,9 @@ def register_view(request):
         else:
             form = UserCreationForm()
         return render(request, 'gym/auth/register.html', {'form': form})
-    except Exception as e:
-        messages.error(request, f"An error occurred during registration: {str(e)}")
+    except Exception:
+        logger.exception("An error occurred during registration.")
+        messages.error(request, "An error occurred during registration. Please try again.")
         form = UserCreationForm()
         return render(request, 'gym/auth/register.html', {'form': form})
 
@@ -153,8 +159,9 @@ def plan_list(request):
     try:
         plans = Plan.objects.filter(user=request.user)
         return render(request, 'gym/plans/list.html', {'plans': plans})
-    except Exception as e:
-        messages.error(request, f"An error occurred while loading plans: {str(e)}")
+    except Exception:
+        logger.exception("An error occurred while loading plans.")
+        messages.error(request, "An error occurred while loading plans. Please try again.")
         return redirect('gym:index')
 
 @login_required
@@ -175,8 +182,9 @@ def plan_create(request):
         else:
             form = PlanForm()
         return render(request, 'gym/plans/create.html', {'form': form})
-    except Exception as e:
-        messages.error(request, f"An error occurred while creating the plan: {str(e)}")
+    except Exception:
+        logger.exception("An error occurred while creating the plan.")
+        messages.error(request, "An error occurred while creating the plan. Please try again.")
         return redirect('gym:plan_list')
 
 @login_required
@@ -191,8 +199,9 @@ def plan_detail(request, plan_id):
     except Http404:
         messages.error(request, "The plan you're looking for does not exist or you don't have permission to view it.")
         return redirect('gym:plan_list')
-    except Exception as e:
-        messages.error(request, f"An error occurred while loading the plan details: {str(e)}")
+    except Exception:
+        logger.exception("An error occurred while loading the plan details.")
+        messages.error(request, "An error occurred while loading the plan details. Please try again.")
         return redirect('gym:plan_list')
 
 @login_required
@@ -354,8 +363,9 @@ def session_start(request):
                     
                     messages.success(request, "Session started successfully.")
                     return redirect('gym:session_detail', session_id=session.id)
-                except Exception as e:
-                    messages.error(request, f"Error creating session: {str(e)}")
+                except Exception:
+                    logger.exception("Error creating session.")
+                    messages.error(request, "Error creating session. Please try again.")
             else:
                 for field, errors in form.errors.items():
                     for error in errors:
@@ -373,8 +383,9 @@ def session_start(request):
             'form': form,
             'recent_sessions': recent_sessions
         })
-    except Exception as e:
-        messages.error(request, f"An unexpected error occurred: {str(e)}")
+    except Exception:
+        logger.exception("An unexpected error occurred.")
+        messages.error(request, "An unexpected error occurred. Please try again.")
         return redirect('gym:index')
 
 @login_required
@@ -410,8 +421,9 @@ def device_session_mark_done(request, session_id, device_session_id):
             messages.success(request, f"Exercise '{device_session.device.name}' marked as completed.")
         
         return redirect('gym:session_detail', session_id=session.id)
-    except Exception as e:
-        messages.error(request, f"An unexpected error occurred: {str(e)}")
+    except Exception:
+        logger.exception("An unexpected error occurred.")
+        messages.error(request, "An unexpected error occurred. Please try again.")
         return redirect('gym:session_detail', session_id=session_id)
 
 @login_required
@@ -431,8 +443,9 @@ def device_session_mark_undone(request, session_id, device_session_id):
             messages.success(request, f"Exercise '{device_session.device.name}' marked as not completed.")
         
         return redirect('gym:session_detail', session_id=session.id)
-    except Exception as e:
-        messages.error(request, f"An unexpected error occurred: {str(e)}")
+    except Exception:
+        logger.exception("An unexpected error occurred.")
+        messages.error(request, "An unexpected error occurred. Please try again.")
         return redirect('gym:session_detail', session_id=session_id)
 
 @login_required
@@ -452,8 +465,9 @@ def device_session_update(request, session_id, device_session_id):
                     updated_session = form.save()
                     messages.success(request, f"Exercise '{updated_session.device.name}' updated successfully.")
                     return redirect('gym:session_detail', session_id=session.id)
-                except Exception as e:
-                    messages.error(request, f"Error saving exercise update: {str(e)}")
+                except Exception:
+                    logger.exception("Error saving exercise update.")
+                    messages.error(request, "Error saving exercise update. Please try again.")
             else:
                 for field, errors in form.errors.items():
                     for error in errors:
@@ -469,8 +483,9 @@ def device_session_update(request, session_id, device_session_id):
     except Http404:
         messages.error(request, "The exercise you're trying to update doesn't exist or you don't have permission to update it.")
         return redirect('gym:session_list')
-    except Exception as e:
-        messages.error(request, f"An unexpected error occurred: {str(e)}")
+    except Exception:
+        logger.exception("An unexpected error occurred.")
+        messages.error(request, "An unexpected error occurred. Please try again.")
         return redirect('gym:session_list')
 
 @login_required
@@ -537,8 +552,9 @@ def profile_view(request):
         }
         
         return render(request, 'gym/profile/view.html', context)
-    except Exception as e:
-        messages.error(request, f"An error occurred while loading your profile: {str(e)}")
+    except Exception:
+        logger.exception("An error occurred while loading your profile.")
+        messages.error(request, "An error occurred while loading your profile. Please try again.")
         return redirect('gym:index')
 
 @login_required
@@ -571,6 +587,7 @@ def edit_profile(request):
             'user': user,
             'profile': profile,
         })
-    except Exception as e:
-        messages.error(request, f"An error occurred while updating your profile: {str(e)}")
+    except Exception:
+        logger.exception("An error occurred while updating your profile.")
+        messages.error(request, "An error occurred while updating your profile. Please try again.")
         return redirect('gym:profile')

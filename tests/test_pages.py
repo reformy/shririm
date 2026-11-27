@@ -32,3 +32,13 @@ class TestPages(TestCase):
         response = self.client.get('/no-such-page/')
         self.assertEqual(response.status_code, 404)
         self.assertIn(b'Page Not Found', response.content)
+
+    def test_errors_are_logged_not_shown(self):
+        from unittest import mock
+        with mock.patch('gym.views.Plan.objects.filter', side_effect=RuntimeError('secret internals')), \
+                self.assertLogs('gym.views', 'ERROR') as logs:
+            response = self.client.get('/gym/plans/')
+        response = self.client.get(response.url)  # The page the error message is shown on.
+        self.assertNotIn(b'secret internals', response.content)
+        self.assertIn(b'An error occurred while loading plans. Please try again.', response.content)
+        self.assertIn('secret internals', '\n'.join(logs.output))
