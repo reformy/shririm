@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .login_rate_limit import rate_limited_login
 
 app_name = 'gym'
 
@@ -8,7 +9,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     
     # Authentication
-    path('accounts/login/', views.login_view, name='login'),
+    path('accounts/login/', rate_limited_login(views.login_view), name='login'),
     path('accounts/logout/', views.logout_view, name='logout'),
     # path('accounts/register/', views.register_view, name='register'),
     

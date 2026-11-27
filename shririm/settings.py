@@ -105,6 +105,19 @@ DATABASES = {
 }
 
 
+# The cache is in the database, so all of the site's processes share it (the failed-login counts are in it).
+# Its table is made by a migration (gym 0008), or "python manage.py createcachetable".
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'shririm_cache',
+    }
+}
+
+# Rate limits count per client IP, which PythonAnywhere passes in X-Real-IP.
+RATELIMIT_IP_META_KEY = 'gym.login_rate_limit.client_ip'
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
