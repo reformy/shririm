@@ -1,6 +1,8 @@
 """
 Template filters for displaying times in the user's timezone
 """
+from datetime import timezone as dt_timezone
+
 from django import template
 from django.utils import timezone
 from django.utils.dateformat import format as date_format
@@ -30,7 +32,7 @@ def in_user_timezone(value, tz_name):
         
     # Make sure the value is timezone-aware
     if timezone.is_naive(value):
-        value = timezone.make_aware(value, timezone.utc)
+        value = timezone.make_aware(value, dt_timezone.utc)
         
     # Convert to the user's timezone
     try:
@@ -93,7 +95,7 @@ def format_datetime_in_timezone(value, tz_name, format_string=None):
     try:
         # Make sure the value is timezone-aware
         if timezone.is_naive(value):
-            value = timezone.make_aware(value, timezone.utc)
+            value = timezone.make_aware(value, dt_timezone.utc)
             
         # Convert to the user's timezone
         user_tz = pytz.timezone(tz_name)
@@ -127,7 +129,7 @@ def format_date_in_timezone(value, tz_name):
     try:
         # Make sure the value is timezone-aware
         if timezone.is_naive(value):
-            value = timezone.make_aware(value, timezone.utc)
+            value = timezone.make_aware(value, dt_timezone.utc)
             
         # Convert to the user's timezone
         user_tz = pytz.timezone(tz_name)
@@ -161,7 +163,7 @@ def format_time_in_timezone(value, tz_name):
     try:
         # Make sure the value is timezone-aware
         if timezone.is_naive(value):
-            value = timezone.make_aware(value, timezone.utc)
+            value = timezone.make_aware(value, dt_timezone.utc)
             
         # Convert to the user's timezone
         user_tz = pytz.timezone(tz_name)
