@@ -69,6 +69,18 @@ The application implements:
 5. Add search and filtering capabilities
 6. Create comprehensive test suite
 
+## Configuration
+
+Settings come from environment variables, or from a `.env` file next to `manage.py` (it is in `.gitignore`):
+
+```
+DJANGO_ENV=development      # Your own computer only: DEBUG on. Anything else (or unset) is production.
+DJANGO_SECRET_KEY=...       # Required in production.
+```
+
+Make a secret key with
+`python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"`.
+
 ## Setup for Development
 
 1. Install dependencies:
@@ -81,7 +93,7 @@ The application implements:
    python manage.py migrate
    ```
 
-3. Create a superuser (already done with username: 'reformy'):
+3. Create a superuser:
    ```
    python manage.py createsuperuser
    ```
@@ -95,9 +107,7 @@ The application implements:
 
 ## Admin Access
 
-- URL: http://localhost:8000/admin/
-- Username: reformy
-- Password: alibaliba
+- URL: http://localhost:8000/admin/, with the superuser you created.
 
 ## Technologies Used
 

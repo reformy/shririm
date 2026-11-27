@@ -4,3 +4,4 @@ pytz==2025.2
 sqlparse==0.5.3
 requests==2.32.4
 Pillow==11.2.1
+python-dotenv==1.2.4

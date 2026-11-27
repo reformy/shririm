@@ -13,22 +13,30 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Environment settings
-# Check if running in development or production
-# Set DJANGO_ENV=production on your production server
-ENVIRONMENT = os.environ.get('DJANGO_ENV', 'development')
+# Settings and secrets come from the environment, or from a .env file next to manage.py (not in git). Real
+# environment variables win over the file.
+load_dotenv(BASE_DIR / '.env')
+
+# Production unless DJANGO_ENV=development (set that on your own computer, e.g. in .env), so a server that
+# forgets to set it never runs with DEBUG on.
+ENVIRONMENT = os.environ.get('DJANGO_ENV', 'production')
 IS_DEVELOPMENT = ENVIRONMENT == 'development'
 IS_PRODUCTION = not IS_DEVELOPMENT
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-# In production, use an environment variable for the secret key
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-)ml6vssv%&^kcc-eehl6e)js0dx00s0vq@6%@vx-=e)2uceqph')
+# SECURITY WARNING: keep the secret key used in production secret! This repository is public, so production
+# must set its own.
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if IS_PRODUCTION:
+        raise ImproperlyConfigured(
+            'Set DJANGO_SECRET_KEY (in the environment or in .env). For local development, set DJANGO_ENV=development.')
+    SECRET_KEY = 'django-insecure-local-development-only'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = IS_DEVELOPMENT
@@ -142,14 +150,13 @@ else:
     # In production, you might want to use a different location
     STATIC_ROOT = os.environ.get('STATIC_ROOT', BASE_DIR / 'staticfiles')
     
-    # Configure additional security settings for production
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    SECURE_SSL_REDIRECT = True
+    # Cookies only over HTTPS, and browsers told to use HTTPS only. HSTS starts at a week; it can grow once it
+    # works. Redirecting plain HTTP is PythonAnywhere's "Force HTTPS" (Web tab). PythonAnywhere already tells
+    # Django which requests are HTTPS, so there is no SECURE_PROXY_SSL_HEADER: a wrong one makes every request
+    # look like HTTP, which breaks CSRF checks (and with SECURE_SSL_REDIRECT, loops).
+    SECURE_HSTS_SECONDS = 7 * 24 * 60 * 60
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Media files (User uploaded files)
 MEDIA_URL = '/media/'
