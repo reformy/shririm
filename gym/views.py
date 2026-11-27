@@ -125,11 +125,6 @@ def device_create(request):
     return render(request, 'gym/devices/create.html', {'form': form})
 
 @login_required
-def device_detail(request, device_id):
-    device = get_object_or_404(Device, id=device_id, created_by=request.user)
-    return render(request, 'gym/devices/detail.html', {'device': device})
-
-@login_required
 def device_edit(request, device_id):
     device = get_object_or_404(Device, id=device_id, created_by=request.user)
     if request.method == 'POST':
