@@ -1,0 +1,49 @@
+name: tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# On a pull request, a new push cancels the tests still running for the previous one. On main every commit
+# is tested to the end.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# The GitHub token only needs to read the code.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.10 installs Pillow 12.3.0, 3.11 and later Pillow 13 (see requirements.txt); test both.
+        python-version: ["3.10", "3.12"]
+
+    steps:
+    # Actions are pinned to commits, so a moved tag can't change what runs.
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Check
+      run: |
+        python manage.py check
+        python manage.py makemigrations --check --dry-run
+    - name: Test
+      run: python manage.py test
+    # With production settings, like the server (a throwaway key; the tests need no other secrets).
+    env:
+      DJANGO_SECRET_KEY: ci-only-not-a-secret
