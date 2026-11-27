@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from django.http import JsonResponse, Http404
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.db.models import Max
 
 from .models import Device, Plan, PlanDevice, Session, DeviceSession, UserProfile
@@ -22,6 +23,11 @@ def login_view(request):
                 if user is not None:
                     login(request, user)
                     messages.success(request, f"Welcome back, {username}!")
+                    # Back to the page that asked for the login, if it is on this site.
+                    next_url = request.GET.get('next', '')
+                    if next_url and url_has_allowed_host_and_scheme(
+                            next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+                        return redirect(next_url)
                     return redirect('gym:index')
                 else:
                     messages.error(request, "Invalid username or password. Please try again.")
