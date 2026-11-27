@@ -1,8 +1,11 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import Device, Plan, PlanDevice, Session, DeviceSession, UserProfile
+from .photos import PhotoField
 
 class DeviceForm(forms.ModelForm):
+    image = PhotoField(required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
+
     class Meta:
         model = Device
         fields = ['name', 'description', 'image']
