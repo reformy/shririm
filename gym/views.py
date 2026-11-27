@@ -55,8 +55,11 @@ def login_view(request):
         return render(request, 'gym/auth/login.html', {'form': form})
 
 def logout_view(request):
-    logout(request)
-    return redirect('gym:login')
+    # POST only (the menu's Logout is a form), so another site can't log you out with a link or an image.
+    if request.method == 'POST':
+        logout(request)
+        return redirect('gym:login')
+    return redirect('gym:index')
 
 def register_view(request):
     try:

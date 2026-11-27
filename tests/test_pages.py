@@ -42,3 +42,10 @@ class TestPages(TestCase):
         self.assertNotIn(b'secret internals', response.content)
         self.assertIn(b'An error occurred while loading plans. Please try again.', response.content)
         self.assertIn('secret internals', '\n'.join(logs.output))
+
+    def test_logout_is_a_post(self):
+        self.assertContains(self.client.get('/gym/'), 'action="/gym/accounts/logout/"')
+        self.client.get('/gym/accounts/logout/')
+        self.assertEqual(self.client.get('/gym/').status_code, 200)  # Still logged in.
+        self.client.post('/gym/accounts/logout/')
+        self.assertEqual(self.client.get('/gym/').status_code, 302)  # Logged out.
